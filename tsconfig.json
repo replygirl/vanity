@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "lib": ["esnext", "dom"],
+    "declaration": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "incremental": false,
+    "rootDirs": ["./", "./src"],
+    "typeRoots": ["./types", "./@types", "node_modules/@types"],
+  },
+  "include": ["src"],
+  "exclude": [
+    ".pnp.js",
+    ".yarn",
+    "coverage",
+    "dist",
+    "node_modules",
+    "**/*.spec.ts"
+  ]
+}

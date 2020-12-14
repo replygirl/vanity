@@ -1,0 +1,9 @@
+exclude_patterns:
+- ".eslintrc.js"
+- ".prettierc.js"
+- ".nyc_output/"
+- ".pnp.js"
+- ".yarn/"
+- "coverage/"
+- "dist/"
+- "**/*.spec.ts"
