@@ -7,19 +7,23 @@ import { entries } from './utils'
 
 type Commit<S> = (payload: Partial<S>) => void
 
-type Method<S> = (...args: any[]) => any
-
-type Nullable<T> = T | null
-
-interface ServiceContext<S> {
+interface Context<S> {
   clear: () => void
   commit: Commit<S>
 }
 
-interface ServiceOptions<S> {
+type Method = (...args: any[]) => any
+
+type Methods<S, M> = M extends Dictionary<Method>
+  ? (ctx: Context<S>) => M
+  : never
+
+type Nullable<T> = T | null
+
+interface ServiceOptions<S, M extends Dictionary<Method> | undefined> {
   name: string
   baseState: S
-  methods?: (ctx: ServiceContext<S>) => Dictionary<Method<S>>
+  methods?: Methods<S, M>
 }
 
 type State<S> = Dictionary<
@@ -31,11 +35,14 @@ type State<S> = Dictionary<
   >
 >
 
-const createService = <S extends State<S>>({
+const createService = <
+  S extends State<S> = any,
+  M extends Dictionary<Method> = Dictionary<Method>
+>({
   name,
   baseState,
   methods
-}: ServiceOptions<S>) => {
+}: ServiceOptions<S, M>) => {
   const state = reactive(rfdc()<S>(baseState)) as S
 
   const storageKey = (k: keyof S) => `service__${name}__${k}`
@@ -59,7 +66,7 @@ const createService = <S extends State<S>>({
   return readonly(
     reactive({
       ...state,
-      ...(methods?.({ clear, commit }) ?? {})
+      ...((methods?.({ clear, commit }) as M) ?? {})
     })
   )
 }

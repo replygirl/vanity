@@ -11,7 +11,7 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "incremental": false,
-    "rootDirs": ["./", "./src"],
+    "rootDirs": ["./src"],
     "typeRoots": ["./types", "./@types", "node_modules/@types"],
   },
   "include": ["src"],
