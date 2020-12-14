@@ -40,7 +40,7 @@ export default createService<State>({
 ```ts
 // Consuming a service
 
-import { watch } from '@vue/reactivity'
+import { watchEffect } from '@vue/reactivity'
 
 import foo from '@/services/foo'
 
