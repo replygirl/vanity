@@ -48,8 +48,8 @@ const createService = <
   const storageKey = (k: keyof S) => `service__${name}__${k}`
 
   entries<S>(state).forEach(([k]) => {
-    const v = localStorage.getItem(storageKey(k))
-    state[k] = JSON.parse(v ?? '') || null
+    const v = JSON.parse(localStorage.getItem(storageKey(k)) ?? '')
+    state[k] = v === '' ? null : v
   })
 
   const commit = (payload: Partial<S>) =>
