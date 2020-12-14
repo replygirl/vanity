@@ -31,7 +31,7 @@ export default createService<State>({
     bar: null
   },
   methods: ({ clear, commit }) => ({
-    setBar(x: boolean) { commit(x) },
+    setBar(bar: boolean) { commit({ bar }) },
     reset() { clear() }
   })
 })
