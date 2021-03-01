@@ -1,7 +1,7 @@
 import type { Dictionary } from 'dictionary-types'
 import rfdc from 'rfdc'
 import { reactive, readonly } from '@vue/reactivity'
-import type { Ref } from '@vue/reactivity'
+import type { DeepReadonly, Ref } from '@vue/reactivity'
 
 import { entries } from './utils'
 
@@ -10,6 +10,7 @@ type Commit<S> = (payload: Partial<S>) => void
 interface Context<S> {
   clear: () => void
   commit: Commit<S>
+  state: DeepReadonly<S>
 }
 
 type Method = (...args: any[]) => any
@@ -43,13 +44,13 @@ const createService = <
   baseState,
   methods
 }: ServiceOptions<S, M>) => {
-  const state = reactive(rfdc()<S>(baseState)) as S
+  const s = reactive(rfdc()<S>(baseState)) as S
 
   const storageKey = (k: keyof S) => `service__${name}__${k}`
 
-  entries<S>(state).forEach(([k, v]) => {
+  entries<S>(s).forEach(([k, v]) => {
     const x = JSON.parse(localStorage.getItem(storageKey(k)) ?? 'null')
-    if (x !== null && x !== v) state[k] = x
+    if (x !== null && x !== v) s[k] = x
   })
 
   const commit = (payload: Partial<S>) =>
@@ -58,15 +59,17 @@ const createService = <
       .forEach(([k, v]) => {
         if (v === null) localStorage.removeItem(storageKey(k))
         else localStorage.setItem(storageKey(k), JSON.stringify(v))
-        state[k] = v
+        s[k] = v
       })
 
   const clear = () => commit(baseState)
 
+  const state = readonly(s) as DeepReadonly<S>
+
   return readonly(
     reactive({
-      ...state,
-      ...((methods?.({ clear, commit }) as M) ?? {})
+      ...s,
+      ...((methods?.({ clear, commit, state }) as M) ?? {})
     })
   )
 }
