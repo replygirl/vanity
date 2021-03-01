@@ -10,7 +10,7 @@ type Commit<S> = (payload: Partial<S>) => void
 interface Context<S> {
   clear: () => void
   commit: Commit<S>
-  state: DeepReadonly<S>
+  state: S
 }
 
 type Method = (...args: any[]) => any
@@ -44,13 +44,13 @@ const createService = <
   baseState,
   methods
 }: ServiceOptions<S, M>) => {
-  const s = reactive(rfdc()<S>(baseState)) as S
+  const state = reactive(rfdc()<S>(baseState)) as S
 
   const storageKey = (k: keyof S) => `service__${name}__${k}`
 
-  entries<S>(s).forEach(([k, v]) => {
+  entries<S>(state).forEach(([k, v]) => {
     const x = JSON.parse(localStorage.getItem(storageKey(k)) ?? 'null')
-    if (x !== null && x !== v) s[k] = x
+    if (x !== null && x !== v) state[k] = x
   })
 
   const commit = (payload: Partial<S>) =>
@@ -59,16 +59,14 @@ const createService = <
       .forEach(([k, v]) => {
         if (v === null) localStorage.removeItem(storageKey(k))
         else localStorage.setItem(storageKey(k), JSON.stringify(v))
-        s[k] = v
+        state[k] = v
       })
 
   const clear = () => commit(baseState)
 
-  const state = readonly(s) as DeepReadonly<S>
-
   return readonly(
     reactive({
-      ...s,
+      ...state,
       ...((methods?.({ clear, commit, state }) as M) ?? {})
     })
   )
